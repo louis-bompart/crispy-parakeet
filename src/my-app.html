@@ -20,6 +20,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/iron-pages/iron-pages.html">
 <link rel="import" href="../bower_components/iron-selector/iron-selector.html">
 <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../bower_components/polymerfire/polymerfire.html">
 <link rel="import" href="my-icons.html">
 
 <dom-module id="my-app">
@@ -58,6 +59,20 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
     </style>
 
+    <firebase-app
+      auth-domain= "inf829-fc7af.firebaseapp.com",
+      database-url= "https://inf829-fc7af.firebaseio.com",
+      api-key= "AIzaSyCROska5v_4_DygnT3eZFKpQYkIv9LKupU",
+      storage-bucket= "inf829-fc7af.appspot.com",
+      messaging-sender-id= "476634849982">
+    </firebase-app>
+    <firebase-document
+      path="/chemicals/0"
+      data="{{data}}">
+    </firebase-document>
+
+    <firebase-auth id="auth" user="{{user}}" on-error="showError"></firebase-auth>
+
     <app-location route="{{route}}"></app-location>
     <app-route
         route="{{route}}"
@@ -65,39 +80,24 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         data="{{routeData}}"
         tail="{{subroute}}"></app-route>
 
-    <app-drawer-layout fullbleed>
-      <!-- Drawer content -->
-      <app-drawer id="drawer">
-        <app-toolbar>Menu</app-toolbar>
-        <iron-selector selected="[[page]]" attr-for-selected="name" class="drawer-list" role="navigation">
-          <a name="view1" href="/view1">View One</a>
-          <a name="view2" href="/view2">View Two</a>
-          <a name="view3" href="/view3">View Three</a>
-        </iron-selector>
-      </app-drawer>
-
-      <!-- Main content -->
       <app-header-layout has-scrolling-region>
 
         <app-header condenses reveals effects="waterfall">
           <app-toolbar>
             <paper-icon-button icon="my-icons:menu" drawer-toggle></paper-icon-button>
-            <div main-title>My App</div>
+            <div main-title>Mendeleiev</div>
           </app-toolbar>
         </app-header>
 
         <iron-pages
             selected="[[page]]"
             attr-for-selected="name"
-            fallback-selection="view404"
+            fallback-selection="not-found"
             role="main">
-          <my-view1 name="view1"></my-view1>
-          <my-view2 name="view2"></my-view2>
-          <my-view3 name="view3"></my-view3>
-          <my-view404 name="view404"></my-view404>
+            <home-view name="home"></home-view>
+            <not-found name="not-found"></not-found>
         </iron-pages>
       </app-header-layout>
-    </app-drawer-layout>
   </template>
 
   <script>
@@ -108,30 +108,36 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         page: {
           type: String,
           reflectToAttribute: true,
+          value: 'home',
           observer: '_pageChanged',
         },
+        data : {
+          type: Object,
+          reflectToAttribute: true
+        }
       },
 
       observers: [
         '_routePageChanged(routeData.page)',
       ],
 
-      _routePageChanged: function(page) {
-        this.page = page || 'view1';
+      ready: function () {
+        this.$.auth.signInAnonymously();
+      },
 
-        if (!this.$.drawer.persistent) {
-          this.$.drawer.close();
-        }
+      _routePageChanged: function(page) {
+        this.page = page || 'home';
       },
 
       _pageChanged: function(page) {
         // Load page import on demand. Show 404 page if fails
-        var resolvedPageUrl = this.resolveUrl('my-' + page + '.html');
+        console.log(this.page);
+        var resolvedPageUrl = this.resolveUrl(page + '-view.html');
         this.importHref(resolvedPageUrl, null, this._showPage404, true);
       },
 
       _showPage404: function() {
-        this.page = 'view404';
+        this.page = 'not-found';
       },
     });
   </script>
