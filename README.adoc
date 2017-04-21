@@ -1,0 +1,4 @@
+= Periodic Table
+Aymeric MASSE <aym.masse@gmail.com>
+
+Simple Polymer app displaying the Mendeleiev periodic table.

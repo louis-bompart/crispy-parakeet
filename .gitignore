@@ -3,9 +3,9 @@
 # Generated files/folders
 *.pyc
 app/css/*
-dist
 build
 
 # Dev directories
 bower_components
 node_modules
+.idea
